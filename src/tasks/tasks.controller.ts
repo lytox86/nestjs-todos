@@ -2,7 +2,6 @@ import {
   Controller,
   Get,
   Post,
-  Put,
   Delete,
   Body,
   Param,
@@ -10,8 +9,9 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
-  NotFoundException, Patch
-} from "@nestjs/common";
+  NotFoundException,
+  Patch,
+} from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { JwtAuthGuard } from '../auth/authenticated.guard';
 import { UserId } from '../users/user.decorator';

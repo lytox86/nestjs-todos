@@ -11,7 +11,7 @@ class ApiClient {
 
   setToken(token) {
     this.token = token;
-    this.client.interceptors.request.use(config => {
+    this.client.interceptors.request.use((config) => {
       config.headers.set('Authorization', `Bearer ${this.token}`);
       return config;
       //console.log(config.headers);
@@ -70,7 +70,9 @@ class ApiClient {
 
   // Error handler
   handleError(error) {
-    console.error(`Error: ${error.response?.status} - ${JSON.stringify(error.response?.data) || error.message}`);
+    console.error(
+      `Error: ${error.response?.status} - ${JSON.stringify(error.response?.data) || error.message}`,
+    );
     throw error;
   }
 }

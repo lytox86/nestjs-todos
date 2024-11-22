@@ -32,7 +32,7 @@ export class AdminService {
     userId: number,
     newPassword: string,
   ): Promise<boolean> {
-    const hashedPassword = await this.authService.hashPassword(newPassword);
+    const hashedPassword = await this.authService.hashString(newPassword);
     return this.usersService.updateUser(userId, { hashedPassword });
   }
 }

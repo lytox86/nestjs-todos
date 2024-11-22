@@ -11,7 +11,7 @@ describe('UsersService', () => {
   let authService: Partial<AuthService>;
 
   beforeEach(async () => {
-    authService = { hashPassword: jest.fn().mockResolvedValue('hash') };
+    authService = { hashString: jest.fn().mockResolvedValue('hash') };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -50,7 +50,7 @@ describe('UsersService', () => {
     expect(user).toEqual({ id: 1, username: 'testuser' });
     expect(saveMock).toHaveBeenCalledTimes(1);
     expect(createMock).toHaveBeenCalledTimes(1);
-    expect(authService.hashPassword).toHaveBeenCalledTimes(1);
+    expect(authService.hashString).toHaveBeenCalledTimes(1);
   });
 
   it('should find a user by username', async () => {

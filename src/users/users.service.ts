@@ -21,7 +21,7 @@ export class UsersService {
   }
 
   async createUser(username: string, password: string) {
-    const hashedPassword = await this.authService.hashPassword(password);
+    const hashedPassword = await this.authService.hashString(password);
     const user = this.userRepository.create({ username, hashedPassword });
     return this.userRepository.save(user);
   }
@@ -41,18 +41,21 @@ export class UsersService {
   /**
    * @return true if user was updated
    */
-  async updateUser(id: number, updates: Partial<User>): Promise<boolean> {
-    const updateResult = await this.userRepository.update(id, updates);
+  async updateUser(
+    id: number,
+    updates: Partial<
+      Pick<User, 'isDeleted' | 'hashedPassword' | 'hashedRefreshToken'>
+    >,
+  ): Promise<boolean> {
+    const updateResult = await this.userRepository.update({ id }, updates);
     return updateResult.affected === 1;
   }
 
-  /**
-   * @return true if user was updated
-   */
-  async updatePassword(userId: number, newHash: string): Promise<boolean> {
-    const updateResult = await this.userRepository.update(userId, {
-      hashedPassword: newHash,
-    });
-    return updateResult.affected === 1;
+  async unsetToken(id: number): Promise<boolean> {
+    const user = await this.findById(id);
+    if (!user) return false;
+    user.hashedRefreshToken = null;
+    await this.userRepository.save(user);
+    return true;
   }
 }

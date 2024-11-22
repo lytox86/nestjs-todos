@@ -12,7 +12,6 @@ import { JWT_SECRET_KEY } from '../constants';
     JwtModule.register({
       global: true,
       secret: JWT_SECRET_KEY,
-      signOptions: { expiresIn: '1h' },
     }),
   ],
   providers: [AuthService, JwtStrategy],
