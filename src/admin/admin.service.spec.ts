@@ -14,7 +14,7 @@ describe('AdminService', () => {
       findById: jest.fn().mockResolvedValue({ id: 1, username: 'testuser' }),
       updateUser: jest.fn().mockResolvedValue(true),
     };
-    authService = { hashPassword: jest.fn().mockResolvedValue('hash') };
+    authService = { hashString: jest.fn().mockResolvedValue('hash') };
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

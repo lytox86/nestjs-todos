@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Task } from '../entities/task.entity';
+import { fromTaskDto, fromTaskUpdateDto, Task } from '../entities/task.entity';
 import { PAGE_SIZE } from '../constants';
 import { TaskUpdateDto } from './task-update.dto';
 import { TaskDto } from './task.dto';
@@ -61,9 +61,9 @@ export class TasksService {
     return queryBuilder.getMany();
   }
 
-  createTask(task: TaskDto, userId: number) {
+  createTask(taskDto: TaskDto, userId: number) {
     const taskEntity = this.taskRepository.create({
-      ...task,
+      ...fromTaskDto(taskDto),
       created: new Date(),
       userId,
     });
@@ -88,7 +88,7 @@ export class TasksService {
         id: taskId,
         userId,
       },
-      taskUpdateDto,
+      fromTaskUpdateDto(taskUpdateDto),
     );
     if (updateResult.affected !== 1) {
       return null;

@@ -1,4 +1,3 @@
-
 const ApiClient = require('./api-consumer.cjs');
 
 // Initialize API clients
@@ -7,35 +6,39 @@ const apiClient = new ApiClient('https://nestjs-todos-o0h8.onrender.com/v1');
 const keypress = async () => {
   process.stdin.setRawMode(true);
   console.log('press any key to continue');
-  return new Promise(resolve => process.stdin.once('data', () => {
-    process.stdin.setRawMode(false);
-    resolve();
-  }))
+  return new Promise((resolve) =>
+    process.stdin.once('data', () => {
+      process.stdin.setRawMode(false);
+      resolve();
+    }),
+  );
 };
 
 // Example API calls
 (async () => {
   try {
-
     console.log('accessing protected endpoint');
     try {
       await apiClient.get(`/tasks`);
     } catch (error) {
-      console.log(error.code + ". Unauthorized");
+      console.log(error.code + '. Unauthorized');
     }
 
     console.log('wrong credentials');
     try {
-      await apiClient.get('/users/login', {username: "admin", password: "wrong"});
+      await apiClient.get('/users/login', {
+        username: 'admin',
+        password: 'wrong',
+      });
     } catch (error) {
-      console.log(error.code + ". Invalid credentials");
+      console.log(error.code + '. Invalid credentials');
     }
 
     console.log('wrong params');
     try {
-      await apiClient.get('/users/login', {username: "admin"});
+      await apiClient.get('/users/login', { username: 'admin' });
     } catch (error) {
-      console.log(error.code + ". Password missing");
+      console.log(error.code + '. Password missing');
     }
 
     console.log('register new user');
@@ -43,17 +46,19 @@ const keypress = async () => {
     const newUser = `johndoe-${Math.random()}`;
     data = await apiClient.post('/users/register', {
       username: newUser,
-      email: "johndoe@example.com",
-      password: "password123"
+      email: 'johndoe@example.com',
+      password: 'password123',
     });
     const userId = data.id;
     console.log(data);
 
-
     console.log('Log in as admin');
     await keypress();
 
-    let response = await apiClient.post('/users/login', {username: "admin", password: "admin"});
+    let response = await apiClient.post('/users/login', {
+      username: 'admin',
+      password: 'admin',
+    });
     let token = response.access_token;
     console.log(token);
     apiClient.setToken(token);
@@ -74,12 +79,12 @@ const keypress = async () => {
     data = await apiClient.get(`/admin/users/${userId}`);
     console.log(data);
 
-    const newPassword = "password1234";
+    const newPassword = 'password1234';
     console.log('changing password');
     await keypress();
 
-    await apiClient.put(`/admin/users/${userId}/change-password`,{
-      newPassword: newPassword
+    await apiClient.put(`/admin/users/${userId}/change-password`, {
+      newPassword: newPassword,
     });
     console.log('changed');
 
@@ -89,11 +94,14 @@ const keypress = async () => {
     try {
       await apiClient.get('/admin/users/999999');
     } catch (error) {
-      console.log(error.code + ". Not Found");
+      console.log(error.code + '. Not Found');
     }
 
     console.log('logging now with new password');
-    response = await apiClient.post('/users/login', {username: newUser, password: newPassword});
+    response = await apiClient.post('/users/login', {
+      username: newUser,
+      password: newPassword,
+    });
     token = response.access_token;
     apiClient.setToken(token);
 
@@ -101,7 +109,10 @@ const keypress = async () => {
     console.log(data);
 
     console.log('logging now as other user');
-    response = await apiClient.post('/users/login', {username: 'testuser1', password: 'testuser1'});
+    response = await apiClient.post('/users/login', {
+      username: 'testuser1',
+      password: 'testuser1',
+    });
     token = response.access_token;
     apiClient.setToken(token);
 
@@ -116,10 +127,10 @@ const keypress = async () => {
     console.log(data);
 
     console.log('adding a task');
-    data = await apiClient.post('/tasks',{
-      name: "Buy milk",
+    data = await apiClient.post('/tasks', {
+      name: 'Buy milk',
       priority: 1,
-      deadline: "2024-11-19T10:10:46.788Z"
+      deadline: '2024-11-19T10:10:46.788Z',
     });
     console.log(data);
     const taskId = data.id;
@@ -133,9 +144,9 @@ const keypress = async () => {
     await keypress();
 
     console.log('editing a task');
-    data = await apiClient.patch(`/tasks/${taskId}`,{
-      name: "Buy bread",
-      completed: true
+    data = await apiClient.patch(`/tasks/${taskId}`, {
+      name: 'Buy bread',
+      completed: true,
     });
     console.log(data);
 
@@ -145,9 +156,9 @@ const keypress = async () => {
     await apiClient.delete(`/tasks/${taskId}`);
     console.log('deleted');
     try {
-    await apiClient.get(`/tasks/${taskId}`);
+      await apiClient.get(`/tasks/${taskId}`);
     } catch (error) {
-      console.log(error.code + ". Task is deleted");
+      console.log(error.code + '. Task is deleted');
     }
 
     await keypress();

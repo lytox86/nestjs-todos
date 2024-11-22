@@ -9,6 +9,8 @@ describe('UsersController (e2e)', () => {
   let app: INestApplication;
   let usersService: UsersService;
   let accessToken: string;
+  let refreshToken: string;
+  let userId: number;
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -33,6 +35,14 @@ describe('UsersController (e2e)', () => {
       });
 
     accessToken = loginResponse.body.access_token;
+    refreshToken = loginResponse.body.refresh_token;
+
+    const whoAmIResponse = await request(app.getHttpServer())
+      .get('/users/who-am-i')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send();
+
+    userId = whoAmIResponse.body.id;
   });
 
   afterAll(async () => {
@@ -82,7 +92,27 @@ describe('UsersController (e2e)', () => {
     expect(response.body.message).toBe('Old password invalid');
   });
 
-  afterAll(async () => {
-    await app.close();
+  it('should refresh the access token', async () => {
+    const refreshResponse = await request(app.getHttpServer())
+      .post('/users/refresh')
+      .send({ userId, refreshToken });
+
+    expect(refreshResponse.status).toBe(201);
+    expect(refreshResponse.body.access_token).toBeDefined();
+  });
+
+  it('cannot refresh access token after logout', async () => {
+    await request(app.getHttpServer())
+      .post('/users/logout')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send();
+
+    console.log(await usersService.findById(userId));
+
+    const refreshResponse = await request(app.getHttpServer())
+      .post('/users/refresh')
+      .send({ userId, refreshToken });
+
+    expect(refreshResponse.status).toBe(401);
   });
 });

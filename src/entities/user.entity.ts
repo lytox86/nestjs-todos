@@ -22,6 +22,9 @@ export class User {
   @Column({ default: UserRole.USER })
   role: UserRole;
 
+  @Column({ nullable: true })
+  hashedRefreshToken: string;
+
   toResponseObject() {
     return {
       id: this.id,

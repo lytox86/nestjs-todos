@@ -7,12 +7,11 @@ import {
   HttpException,
   HttpStatus,
   HttpCode,
-  UnauthorizedException,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
 import { AuthService } from '../auth/auth.service';
-import { UsersService } from '../users/users.service';
+import { UsersService } from './users.service';
 import { JwtAuthGuard } from '../auth/authenticated.guard';
 import {
   ApiBearerAuth,
@@ -24,6 +23,8 @@ import { LoginDto } from './login.dto';
 import { ChangePasswordDto } from './change-password.dto';
 import { UserId } from './user.decorator';
 import { RegisterDto } from './register.dto';
+import { LoginService } from './login.service';
+import { RefreshDto } from './refresh.dto';
 
 @Controller({ version: '1', path: 'users' })
 @ApiTags('users')
@@ -31,6 +32,7 @@ export class UsersController {
   constructor(
     private readonly authService: AuthService,
     private readonly usersService: UsersService,
+    private readonly loginService: LoginService,
   ) {}
   private readonly logger = new Logger(UsersController.name);
 
@@ -38,30 +40,35 @@ export class UsersController {
   @ApiOperation({ summary: 'login' })
   @ApiResponse({ status: 401, description: 'Invalid credentials.' }) // TODO document all endpoints
   async login(@Body() loginDto: LoginDto) {
-    const { username, password } = loginDto; // TODO move logic to service without HTTP exceptions
-    const user = await this.usersService.findByUsername(username);
-    if (user === null || user.isDeleted) {
-      this.logger.debug(
-        `no user found ${username}, ${JSON.stringify(loginDto)}`,
-      );
-      throw new UnauthorizedException('Invalid username or password');
-    }
+    const { tokens, user } = await this.loginService.login(loginDto);
 
-    // Check password validity
-    const isPasswordValid = await this.authService.verifyPassword(
-      password,
-      user.hashedPassword,
+    const hashedRefreshToken = await this.authService.hashString(
+      tokens.refreshToken,
     );
-    if (!isPasswordValid) {
-      this.logger.debug('wrong password');
-      throw new UnauthorizedException('Invalid username or password');
-    }
+    await this.usersService.updateUser(user.id, { hashedRefreshToken });
 
-    // Issue JWT token
-    const accessToken = await this.authService.login(user);
     return {
-      access_token: accessToken,
+      access_token: tokens.accessToken,
+      refresh_token: tokens.refreshToken,
     };
+  }
+
+  @Post('refresh')
+  async refreshToken(@Body() refreshDto: RefreshDto) {
+    const { userId, refreshToken } = refreshDto;
+    const token = await this.loginService.refreshToken(userId, refreshToken);
+    return { access_token: token.accessToken };
+  }
+
+  @Post('logout')
+  @ApiBearerAuth('access-token')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async logout(@UserId() userId: number) {
+    const wasUpdated = await this.usersService.unsetToken(userId);
+    if (!wasUpdated) {
+      throw new NotFoundException();
+    }
   }
 
   @Post('register')
@@ -93,7 +100,7 @@ export class UsersController {
     }
 
     // Check if the old password is correct
-    const isOldPasswordValid = await this.authService.verifyPassword(
+    const isOldPasswordValid = await this.authService.verifyHash(
       oldPassword,
       user.hashedPassword,
     );
@@ -102,9 +109,11 @@ export class UsersController {
     }
 
     // Update the password
-    const hashedNewPassword = await this.authService.hashPassword(newPassword);
+    const hashedNewPassword = await this.authService.hashString(newPassword);
 
-    await this.usersService.updatePassword(userId, hashedNewPassword);
+    await this.usersService.updateUser(userId, {
+      hashedPassword: hashedNewPassword,
+    });
   }
 
   @Get('who-am-i')

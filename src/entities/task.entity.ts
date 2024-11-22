@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn, Index } from "typeorm";
+import { Entity, Column, PrimaryGeneratedColumn, Index } from 'typeorm';
+import { TaskDto } from '../tasks/task.dto';
+import { TaskUpdateDto } from '../tasks/task-update.dto';
 
 @Entity()
 export class Task {
@@ -38,4 +40,29 @@ export class Task {
       isCompleted: this.completed,
     };
   }
+}
+
+export function fromTaskDto(taskDto: TaskDto) {
+  const task = new Task();
+  task.name = taskDto.name;
+  task.priority = taskDto.priority;
+  task.deadline = taskDto.deadline;
+  return task;
+}
+
+export function fromTaskUpdateDto(taskUpdateDto: TaskUpdateDto): Partial<Task> {
+  const taskUpdate: Partial<Task> = {};
+  if (taskUpdateDto.name !== undefined) {
+    taskUpdate.name = taskUpdateDto.name;
+  }
+  if (taskUpdateDto.priority !== undefined) {
+    taskUpdate.priority = taskUpdateDto.priority;
+  }
+  if (taskUpdateDto.deadline !== undefined) {
+    taskUpdate.deadline = taskUpdateDto.deadline;
+  }
+  if (taskUpdateDto.completed !== undefined) {
+    taskUpdate.completed = taskUpdateDto.completed;
+  }
+  return taskUpdate;
 }

@@ -1,4 +1,3 @@
-
 const ApiClient = require('./api-consumer.cjs');
 
 // Initialize API client
@@ -7,10 +6,12 @@ const api = new ApiClient('https://673790584eb22e24fca58f45.mockapi.io/api/v1');
 const keypress = async () => {
   process.stdin.setRawMode(true);
   console.log('press any key to continue');
-  return new Promise(resolve => process.stdin.once('data', () => {
-    process.stdin.setRawMode(false);
-    resolve();
-  }))
+  return new Promise((resolve) =>
+    process.stdin.once('data', () => {
+      process.stdin.setRawMode(false);
+      resolve();
+    }),
+  );
 };
 
 // Example API calls
@@ -26,7 +27,10 @@ const keypress = async () => {
     console.log('adding new user');
 
     // add new user
-    data = await api.post('/users', { username: 'username', password: 'password' });
+    data = await api.post('/users', {
+      username: 'username',
+      password: 'password',
+    });
     console.log(data);
     const newUserId = data.id;
 
@@ -41,7 +45,10 @@ const keypress = async () => {
     console.log('modifying just added user');
 
     // modify added user
-    data = await api.put(`/users/${newUserId}`, { username: 'newUsername', password: 'newPassword' });
+    data = await api.put(`/users/${newUserId}`, {
+      username: 'newUsername',
+      password: 'newPassword',
+    });
     console.log(data);
 
     await keypress();

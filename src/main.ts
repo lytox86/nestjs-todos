@@ -5,7 +5,7 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { Logger, ValidationPipe, VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
-  const logger = new Logger("main");
+  const logger = new Logger('main');
   const app = await NestFactory.create(AppModule, new FastifyAdapter());
   app.enableVersioning({
     type: VersioningType.URI,

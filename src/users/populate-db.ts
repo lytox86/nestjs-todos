@@ -22,7 +22,7 @@ export class PopulateDbService {
     this.logger.log('PopulateDbService');
     const adminUser = new User();
     adminUser.username = 'admin';
-    adminUser.hashedPassword = await this.authService.hashPassword('admin');
+    adminUser.hashedPassword = await this.authService.hashString('admin');
     adminUser.role = UserRole.ADMIN;
     await this.userRepository.save(adminUser);
 
@@ -30,7 +30,7 @@ export class PopulateDbService {
     for (let i = 0; i < 10; i++) {
       const user = new User();
       user.username = `testuser${i}`;
-      user.hashedPassword = await this.authService.hashPassword(`testuser${i}`);
+      user.hashedPassword = await this.authService.hashString(`testuser${i}`);
       //user.role = UserRole.USER;
       const savedUser = await this.userRepository.save(user);
       //const taskAmoumt = i === 1 ? 100 : 10;

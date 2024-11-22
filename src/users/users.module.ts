@@ -6,13 +6,14 @@ import { UsersController } from './users.controller';
 import { AuthModule } from '../auth/auth.module';
 import { PopulateDbService } from './populate-db';
 import { Task } from '../entities/task.entity';
+import { LoginService } from './login.service';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Task]), // move DB populator to own module
     AuthModule,
   ],
-  providers: [UsersService, PopulateDbService],
+  providers: [UsersService, LoginService, PopulateDbService],
   exports: [UsersService, PopulateDbService],
   controllers: [UsersController],
 })
