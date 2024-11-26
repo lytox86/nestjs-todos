@@ -26,7 +26,7 @@ describe('TasksController (e2e)', () => {
 
     await usersService.createUser('johndoe', 'password123');
     await tasksService.createTask(
-      { name: 'Task', priority: 0, deadline: new Date() },
+      { name: 'Task', priority: 2, deadline: new Date() },
       1,
     );
     const loginResponse = await request(app.getHttpServer())
@@ -76,7 +76,7 @@ describe('TasksController (e2e)', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name: 'Task',
-        priority: 0,
+        priority: 2,
         deadline: '2024-12-31T17:27:54.347Z',
       });
 
@@ -106,7 +106,7 @@ describe('TasksController (e2e)', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name: 'Task to Update',
-        priority: 0,
+        priority: 2,
         deadline: '2024-12-31T17:27:54.347Z',
       });
 
@@ -133,7 +133,7 @@ describe('TasksController (e2e)', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send({
         name: 'Task to Delete',
-        priority: 0,
+        priority: 2,
       });
 
     const taskId = createResponse.body.id;

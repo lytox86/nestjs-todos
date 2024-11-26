@@ -18,7 +18,7 @@ import { JwtAuthGuard } from '../auth/authenticated.guard';
 import { ResetPasswordDto } from './reset-password.dto';
 
 @Controller({ version: '1', path: 'admin/users' })
-@UseGuards(JwtAuthGuard, AdminGuard) // this injects user in request
+@UseGuards(JwtAuthGuard, AdminGuard) // JwtAuthGuard first, it injects user in request
 @ApiBearerAuth('access-token')
 export class AdminController {
   constructor(private readonly adminService: AdminService) {}

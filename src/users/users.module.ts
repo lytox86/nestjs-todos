@@ -10,7 +10,7 @@ import { LoginService } from './login.service';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Task]), // move DB populator to own module
+    TypeOrmModule.forFeature([User, Task]), // TODO move DB populator to own module
     AuthModule,
   ],
   providers: [UsersService, LoginService, PopulateDbService],

@@ -107,8 +107,6 @@ describe('UsersController (e2e)', () => {
       .set('Authorization', `Bearer ${accessToken}`)
       .send();
 
-    console.log(await usersService.findById(userId));
-
     const refreshResponse = await request(app.getHttpServer())
       .post('/users/refresh')
       .send({ userId, refreshToken });

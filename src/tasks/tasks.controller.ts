@@ -18,7 +18,7 @@ import { UserId } from '../users/user.decorator';
 import { TaskUpdateDto } from './task-update.dto';
 import { TaskDto } from './task.dto';
 import { ApiBearerAuth, ApiQuery } from '@nestjs/swagger';
-import { FindTasksQueryDto } from '../users/find-tasks-query.dto';
+import { FindTasksQueryDto } from './find-tasks-query.dto';
 
 @Controller({ version: '1', path: 'tasks' })
 @UseGuards(JwtAuthGuard) // Ensure that only authenticated users can access this controller
